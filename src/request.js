@@ -8,6 +8,13 @@ module.exports = function loggedRequest(...args) {
   return throttle.acquire()
   .then(() => {
     log('Request: ', args);
+
+    const requestArgs = args[0];
+    const qs = requestArgs.qs
+      ? Object.keys(requestArgs.qs).map(key => `${key}=${requestArgs.qs[key]}`).join('&')
+      : '';
+
+    log(`Request URL: ${requestArgs.uri}?${qs}`);
   })
   .then(() => request(...args))
   .catch((err) => {

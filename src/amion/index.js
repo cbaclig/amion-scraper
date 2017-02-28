@@ -1,10 +1,10 @@
 const log = require('../logger')('amion');
-const crawler = require('./crawler');
+const Crawler = require('./crawler');
 
 class Amion {
   static getICalSchedules(password) {
-    return crawler.init(password)
-    .then(() => crawler.getCreateSchedulePage())
+    return Crawler.init(password)
+    .then(crawler => crawler.getCreateSchedulePage())
     .then((createSchedulePage) => {
       // TODO Get all users months, not just first few
       const users = createSchedulePage.getUsers().splice(0, 1);
@@ -33,6 +33,16 @@ class Amion {
         ))
       ), Promise.resolve([]));
     });
+  }
+
+  static getICalScheduleForMonth(token, person, month) {
+    return new Crawler(token).createSchedule(person, month)
+    .then(monthSchedulePage => monthSchedulePage.clickICalLink())
+    .then(downloadICalPage => downloadICalPage.getICal())
+    .then(iCalString => ({
+      person,
+      iCalStrings: [iCalString],
+    }));
   }
 }
 

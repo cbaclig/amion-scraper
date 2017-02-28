@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "test": "npm run lint"
   },
+  "bin": "./src/cli.js",
   "author": "",
   "license": "ISC",
   "dependencies": {
