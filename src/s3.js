@@ -1,3 +1,4 @@
+const log = require('./logger')('s3');
 const AWS = require('aws-sdk');
 
 const s3 = new AWS.S3({
@@ -8,6 +9,8 @@ const s3 = new AWS.S3({
 
 module.exports = {
   uploadJSONData(jsonData) {
+    log('Uploading data to S3...');
+
     return s3.putObject({
       Bucket: process.env.AWS_S3_BUCKET,
       Key: process.env.AWS_S3_DATA_KEY,

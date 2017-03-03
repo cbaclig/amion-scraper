@@ -1,9 +1,62 @@
+const log = require('./logger')('job-queue');
+const AWS = require('aws-sdk');
+
+const sqs = new AWS.SQS({
+  apiVersion: '2012-11-05',
+  endpoint: 'https://sqs.us-west-2.amazonaws.com',
+  region: 'us-west-2',
+});
+
+const QUEUE_URL = 'https://sqs.us-west-2.amazonaws.com/877478752829/amion-scraper-jobs.fifo';
+const MESSAGE_GROUP_ID = 'jobs';
+const JOB_QUEUE = [];
+
 module.exports = {
-  enqueue(token, user, month) {
-    return Promise.resolve(token, user, month);
+  enqueue(jobs) {
+    log(`Enqueuing ${jobs.length} jobs`);
+
+    // TODO sendBatchMessage 1o at a time
+    // TODO handle/log errors
+    return jobs.reduce((promise, job) => (
+      promise.then(() => (new Promise((resolve, reject) => {
+        sqs.sendMessage({
+          QueueUrl: QUEUE_URL,
+          MessageBody: JSON.stringify(job),
+          MessageGroupId: MESSAGE_GROUP_ID,
+          MessageDeduplicationId: `${job.user.id}_${job.month}`,
+        }, err => (err ? reject(err) : resolve()));
+      })))
+    ), Promise.resolve());
   },
 
   dequeue() {
-    return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      sqs.receiveMessage({
+        QueueUrl: QUEUE_URL,
+      }, (err, data) => (err ? reject(err) : resolve(data)));
+    })
+    .then(data => new Promise((resolve, reject) => {
+      log('Received data: ', data);
+      const { Messages } = data;
+
+      if (Messages && Messages.length) {
+        const [{ ReceiptHandle, Body }] = Messages;
+
+        sqs.deleteMessage({
+          QueueUrl: QUEUE_URL,
+          ReceiptHandle,
+        }, err => (err ? reject(err) : resolve(JSON.parse(Body))));
+      } else {
+        resolve();
+      }
+    }));
+  },
+
+  inspect() {
+    // TODO with SQS
+    return Promise.resolve().then(() => {
+      log(`Inspect: JOB_QUEUE.length: ${JOB_QUEUE.length}`);
+      log('Inspect: JOB_QUEUE: ', JOB_QUEUE);
+    });
   },
 };

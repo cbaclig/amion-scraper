@@ -22,17 +22,17 @@ module.exports = {
   },
 
   start() {
-    return Amion.getSchedulesToFetch()
-    .then(JobQueue.enque)
-    .then(this.startNextJob);
+    return Amion.getSchedulesToFetch(amionPassword)
+    .then(JobQueue.enqueue)
+    .then(this.startNextJob.bind(this));
   },
 
   processJob() {
     return JobQueue.dequeue()
     .then((job) => {
       if (job) {
-        return this.storeSchedule(job.token, job.user, job.month)
-        .then(() => this.startNextJob);
+        return this.storeSchedule(job.user, job.month)
+        .then(this.startNextJob.bind(this));
       }
 
       return this.processSchedules();
@@ -40,17 +40,21 @@ module.exports = {
   },
 
   startNextJob() {
-    return Lambda.createProcessJobTask();
+    // return Lambda.createProcessJobTask();
+    log('Starting next job...');
+    return this.processJob();
   },
 
-  storeSchedule(token, user, month) {
-    return Amion.getICalScheduleForMonth(token, user, month)
+  storeSchedule(user, month) {
+    return Amion.getICalScheduleForMonth(amionPassword, user, month)
     .then(schedule => scheduleStore.add(user, month, schedule))
-    .then(() => log('Done!'));
+    .then(() => log(`Done storing schedule for ${user.id} on ${month}!`));
   },
 
   processSchedules() {
-    return scheduleStore.getAll()
+    // TODO don't replace the s3 file if there are no schedules?
+    return scheduleStore.inspect()
+    .then(scheduleStore.getAll.bind(scheduleStore))
     .then(Translator.ingestICalSchedules)
     .then(S3.uploadJSONData)
     .then(() => log('Done!'));

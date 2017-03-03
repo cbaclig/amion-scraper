@@ -6,5 +6,9 @@ const scraper = require('./');
 // scraper.all();
 
 // !54fb6707lwuc]30, 264, 2-17
-scraper.storeICal('!54fb6707lwuc]30', { Rsel: 264 }, '2-17')
-.then(() => storeSchedule);
+
+scraper.start().then(() => console.log('Done with CLI')).catch(console.log.bind(console));
+
+// scraper.processJob().then(() => console.log('Done with CLI')).catch(console.log.bind(console));
+
+// scraper.processSchedules().then(() => console.log('Done with CLI')).catch(console.log.bind(console));

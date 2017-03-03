@@ -35,14 +35,28 @@ class Amion {
     });
   }
 
-  static getICalScheduleForMonth(token, person, month) {
-    return new Crawler(token).createSchedule(person, month)
+  static getICalScheduleForMonth(password, person, month) {
+    return Crawler.init(password)
+    .then(crawler => crawler.createSchedule(person, month))
     .then(monthSchedulePage => monthSchedulePage.clickICalLink())
     .then(downloadICalPage => downloadICalPage.getICal())
     .then(iCalString => ({
       person,
       iCalStrings: [iCalString],
     }));
+  }
+
+  static getSchedulesToFetch(password) {
+    return Crawler.init(password)
+    .then(crawler => crawler.getCreateSchedulePage())
+    .then((createSchedulePage) => {
+      const users = createSchedulePage.getUsers().slice(0, 1);
+      const months = createSchedulePage.getMonths();
+
+      log('Schedules to fetch: ', users.reduce((list, user) => list.concat(months.map(month => ({ user, month }))), []));
+
+      return users.reduce((list, user) => list.concat(months.map(month => ({ user, month }))), []);
+    });
   }
 }
 
