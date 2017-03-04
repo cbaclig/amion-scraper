@@ -2,5 +2,5 @@ deployment:
   prod:
     branch: master
     commands:
-      - npm prune production
+      - npm prune --production
       - zip -r - . -x *.git* | aws s3 cp - s3://amioff/lambda_source.zip
