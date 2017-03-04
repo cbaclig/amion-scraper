@@ -3,4 +3,6 @@ deployment:
     branch: master
     commands:
       - npm prune --production
-      - zip -r - . -x *.git* | aws s3 cp - s3://amioff/lambda_source.zip
+      - zip -qr - . -x *.git* | aws s3 cp - s3://amioff/lambda_source.zip
+      # Look into --publish | --no-publish
+      - aws lambda update-function-code --function-name amion-scraper-plan --s3-bucket amioff --s3-key lambda_source.zip
