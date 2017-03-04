@@ -7,12 +7,6 @@ const scheduleStore = require('./store')({});
 const JobQueue = require('./job_queue');
 const Lambda = require('./lambda');
 
-const amionPassword = process.argv[2];
-
-if (!amionPassword) {
-  throw new Error('Amion password required as an argument!');
-}
-
 module.exports = {
   all() {
     return Amion.getICalSchedules(amionPassword)
@@ -21,35 +15,35 @@ module.exports = {
     .then(() => log('Done!'));
   },
 
-  start() {
+  start(amionPassword) {
     return Amion.getSchedulesToFetch(amionPassword)
     .then(JobQueue.enqueue)
-    .then(this.startNextJob.bind(this));
+    .then(this.startNextJob.bind(this, amionPassword));
   },
 
-  processJob() {
+  processJob(amionPassword) {
     return JobQueue.dequeue()
     .then((job) => {
       if (job) {
-        return this.storeSchedule(job.user, job.month)
-        .then(this.startNextJob.bind(this));
+        return this.storeSchedule(amionPassword, job.user, job.month)
+        .then(this.startNextJob.bind(this, amionPassword));
       }
 
       return this.processSchedules();
     });
   },
 
-  startNextJob() {
+  startNextJob(amionPassword) {
     // return Lambda.createProcessJobTask();
     log('Starting next job...');
-    return this.processJob();
+    return this.processJob(amionPassword);
   },
 
-  storeSchedule(user, month) {
+  storeSchedule(amionPassword, user, month) {
     return Amion.getICalScheduleForMonth(amionPassword, user, month)
     .then(schedule => scheduleStore.add(user, month, schedule))
     .then(() => log(`Done storing schedule for ${user.id} on ${month}!`));
-  },
+  ,
 
   processSchedules() {
     // TODO don't replace the s3 file if there are no schedules?

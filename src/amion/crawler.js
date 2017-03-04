@@ -12,6 +12,10 @@ class Crawler {
   }
 
   static init(password) {
+    if (!password) {
+      throw new Error('Amion password required for Crawler.init()!');
+    }
+
     if (this.sessionToken) {
       return Promise.resolve(this.sessionToken);
     }
