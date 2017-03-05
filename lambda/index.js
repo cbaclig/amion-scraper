@@ -1,3 +1,4 @@
+require('dotenv-safe').load();
 const log = require('../src/logger')('lambda-main');
 const AWS = require('aws-sdk');
 
@@ -25,17 +26,21 @@ function decryptPassword() {
 const Main = require('../src/');
 
 exports.plan = (event, context, callback) => {
-  decryptPassword
+  decryptPassword()
   .then(password => Main.start(password))
-  .then(() => callback());
+  .then(() => callback())
+  .catch(log);
 };
 
 exports.processJob = (event, context, callback) => {
-  decryptPassword
+  decryptPassword()
   .then(password => Main.processJob(password))
-  .then(() => callback());
+  .then(() => callback())
+  .catch(log);
 };
 
 exports.reduce = (event, context, callback) => {
-  Main.processSchedules().then(() => callback());
+  Main.processSchedules()
+  .then(() => callback())
+  .catch(log);
 };

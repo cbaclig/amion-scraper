@@ -7,7 +7,8 @@
     "debug": "DEBUG=* node --debug-brk src/index.js",
     "inspector": "node-inspector .",
     "lint": "eslint .",
-    "test": "npm run lint"
+    "test": "npm run lint",
+    "build": "webpack"
   },
   "bin": "./src/cli.js",
   "author": "",
@@ -27,7 +28,10 @@
     "sleep-promise": "^2.0.0"
   },
   "devDependencies": {
+    "babel-core": "^6.23.1",
     "babel-eslint": "^7.1.1",
+    "babel-loader": "^6.3.2",
+    "babel-preset-es2015": "^6.22.0",
     "eslint": "^3.14.1",
     "eslint-config-airbnb": "^14.0.0",
     "eslint-plugin-import": "^2.2.0",
@@ -35,6 +39,7 @@
     "eslint-plugin-react": "^6.9.0",
     "jest-exponent": "^0.2.0",
     "node-debugger": "^1.0.0",
-    "node-inspector": "^0.12.8"
+    "node-inspector": "^0.12.8",
+    "webpack": "^2.2.1"
   }
 }
