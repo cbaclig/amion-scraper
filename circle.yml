@@ -1,6 +1,7 @@
 deployment:
   prod:
     branch: master
+    owner: cbaclig
     commands:
       - npm prune --production
       - zip -qr - . -x *.git* | aws s3 cp - s3://amioff/lambda_source.zip

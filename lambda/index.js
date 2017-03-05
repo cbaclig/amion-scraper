@@ -1,15 +1,41 @@
+const log = require('../src/logger')('lambda-main');
+const AWS = require('aws-sdk');
+
+const encrypted = process.env.AMION_PASSWORD;
+let decrypted;
+
+function decryptPassword() {
+  if (decrypted) return Promise.resolve(decrypted);
+
+  return new Promise((resolve, reject) => {
+    // Decrypt code should run once and variables stored outside of the function
+    // handler so that these are decrypted once per container
+    const kms = new AWS.KMS();
+    kms.decrypt({ CiphertextBlob: new Buffer(encrypted, 'base64') }, (err, data) => {
+      if (err) {
+        log('Decrypt error:', err);
+        reject(err);
+      } else {
+        resolve(data.Plaintext.toString('ascii'));
+      }
+    });
+  });
+}
+
 const Main = require('../src/');
 
-const Env = process.env;
-
 exports.plan = (event, context, callback) => {
-  Main.start(Env.AMION_PASSWORD).then(() => callback());
+  decryptPassword
+  .then(password => Main.start(password))
+  .then(() => callback());
 };
 
 exports.processJob = (event, context, callback) => {
-  Main.processJob(Env.AMION_PASSWORD).then(() => callback());
+  decryptPassword
+  .then(password => Main.processJob(password))
+  .then(() => callback());
 };
 
 exports.reduce = (event, context, callback) => {
-  Main.processSchedules(Env.AMION_PASSWORD).then(() => callback());
+  Main.processSchedules().then(() => callback());
 };
