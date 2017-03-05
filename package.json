@@ -12,7 +12,7 @@
     "inspector": "node-inspector .",
     "lint": "eslint .",
     "test": "npm run lint",
-    "build": "webpack"
+    "build": "webpack --display-error-details --verbose"
   },
   "bin": "./src/cli.js",
   "author": "",
