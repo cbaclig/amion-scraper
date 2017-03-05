@@ -5,7 +5,7 @@ const Amion = require('./amion');
 const Translator = require('./translator');
 const scheduleStore = require('./store')({});
 const JobQueue = require('./job_queue');
-// const Lambda = require('./lambda');
+const Lambda = require('./lambda');
 
 module.exports = {
   all(amionPassword) {
@@ -18,7 +18,7 @@ module.exports = {
   start(amionPassword) {
     return Amion.getSchedulesToFetch(amionPassword)
     .then(JobQueue.enqueue)
-    .then(this.startNextJob.bind(this, amionPassword));
+    .then(this.executeProcessJob.bind(this, amionPassword));
   },
 
   processJob(amionPassword) {
@@ -26,18 +26,20 @@ module.exports = {
     .then((job) => {
       if (job) {
         return this.storeSchedule(amionPassword, job.user, job.month)
-        .then(this.startNextJob.bind(this, amionPassword));
+        .then(this.executeProcessJob.bind(this, amionPassword));
       }
 
       return this.processSchedules();
     });
   },
 
-  startNextJob(amionPassword) {
-    // return Lambda.createProcessJobTask();
-    log('Starting next job...');
-    return this.processJob(amionPassword);
+  executeProcessJob() {
+    return Lambda.executeProcessJob();
   },
+
+  // executeProcessJob(amionPassword) {
+  //   return this.processJob(amionPassword);
+  // },
 
   storeSchedule(amionPassword, user, month) {
     return Amion.getICalScheduleForMonth(amionPassword, user, month)
@@ -47,8 +49,7 @@ module.exports = {
 
   processSchedules() {
     // TODO don't replace the s3 file if there are no schedules?
-    return scheduleStore.inspect()
-    .then(scheduleStore.getAll.bind(scheduleStore))
+    return scheduleStore.getAll(scheduleStore)
     .then(Translator.ingestICalSchedules)
     .then(S3.uploadJSONData)
     .then(() => log('Done!'));

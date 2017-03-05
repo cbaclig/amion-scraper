@@ -9,7 +9,6 @@ const sqs = new AWS.SQS({
 
 const QUEUE_URL = 'https://sqs.us-west-2.amazonaws.com/877478752829/amion-scraper-jobs.fifo';
 const MESSAGE_GROUP_ID = 'jobs';
-const JOB_QUEUE = [];
 
 module.exports = {
   enqueue(jobs) {
@@ -50,13 +49,5 @@ module.exports = {
         resolve();
       }
     }));
-  },
-
-  inspect() {
-    // TODO with SQS
-    return Promise.resolve().then(() => {
-      log(`Inspect: JOB_QUEUE.length: ${JOB_QUEUE.length}`);
-      log('Inspect: JOB_QUEUE: ', JOB_QUEUE);
-    });
   },
 };

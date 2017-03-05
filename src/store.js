@@ -52,10 +52,5 @@ module.exports = function dataStore() {
 
       return getScheduleChunk();
     },
-
-    inspect() {
-      log('Store: ', this.schedules);
-      return Promise.resolve();
-    },
   };
 };
