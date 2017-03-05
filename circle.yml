@@ -8,7 +8,6 @@ deployment:
     owner: cbaclig
     commands:
       - npm run build
-      - cd dist
-      - zip -qr - .  | aws s3 cp - s3://amioff/lambda_source.zip
+      - cd dist && zip -qr - .  | aws s3 cp - s3://amioff/lambda_source.zip
       # Look into --publish | --no-publish
       - aws lambda update-function-code --region us-west-2 --function-name amion-scraper-plan --s3-bucket amioff --s3-key lambda_source.zip
