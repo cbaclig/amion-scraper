@@ -2,6 +2,10 @@
   "name": "amion-scraper",
   "version": "1.0.0",
   "description": "Scrape amion.com",
+  "repository": {
+    "type": "git",
+    "url": "cbaclig/amion-scraper"
+  },
   "scripts": {
     "start": "DEBUG=* node src/index.js",
     "debug": "DEBUG=* node --debug-brk src/index.js",
