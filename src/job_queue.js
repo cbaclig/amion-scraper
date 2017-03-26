@@ -35,8 +35,9 @@ module.exports = {
       }, (err, data) => (err ? reject(err) : resolve(data)));
     })
     .then(data => new Promise((resolve, reject) => {
-      log('Received data: ', data);
       const { Messages } = data;
+
+      log(`Received ${Messages && Messages.length ? '' : 'no '}data`);
 
       if (Messages && Messages.length) {
         const [{ ReceiptHandle, Body }] = Messages;

@@ -31,7 +31,7 @@ module.exports = function dataStore() {
           // ReceiveRequestAttemptId: TODO look into using this to recover from network failures
         }).promise().then(({ Messages }) => {
           if (Messages && Messages.length) {
-            log(`Recevied ${Messages.length} messages: `, Messages);
+            log(`Recevied ${Messages.length} messages`);
 
             schedules.push(...Messages.map(({ Body }) => JSON.parse(Body)));
 
