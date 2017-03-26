@@ -11,3 +11,4 @@ deployment:
       - cd dist && zip -r - . ../.env.example | aws s3 cp - s3://amioff/lambda_source.zip
       # Look into --publish | --no-publish
       - aws lambda update-function-code --region us-west-2 --function-name amion-scraper-plan --s3-bucket amioff --s3-key lambda_source.zip
+      - aws lambda update-function-code --region us-west-2 --function-name amion-scraper-processJob --s3-bucket amioff --s3-key lambda_source.zip
