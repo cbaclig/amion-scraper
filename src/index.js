@@ -8,13 +8,6 @@ const JobQueue = require('./job_queue');
 const Lambda = require('./lambda');
 
 module.exports = {
-  all(amionPassword) {
-    return Amion.getICalSchedules(amionPassword)
-    .then(Translator.ingestICalSchedules)
-    .then(S3.uploadJSONData)
-    .then(() => log('Done!'));
-  },
-
   start(amionPassword) {
     return Amion.getSchedulesToFetch(amionPassword)
     .then(JobQueue.enqueue)
@@ -36,10 +29,6 @@ module.exports = {
   executeProcessJob() {
     return Lambda.executeProcessJob();
   },
-
-  // executeProcessJob(amionPassword) {
-  //   return this.processJob(amionPassword);
-  // },
 
   storeSchedule(amionPassword, user, month) {
     return Amion.getICalScheduleForMonth(amionPassword, user, month)

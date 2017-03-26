@@ -7,14 +7,16 @@ const throttle = new Throttle(1, 1000);
 module.exports = function loggedRequest(...args) {
   return throttle.acquire()
   .then(() => {
-    log('Request: ', args);
-
     const requestArgs = args[0];
     const qs = requestArgs.qs
       ? Object.keys(requestArgs.qs).map(key => `${key}=${requestArgs.qs[key]}`).join('&')
       : '';
 
-    log(`Request URL: ${requestArgs.uri}?${qs}`);
+    log('HTTP Request: ', {
+      httpRequest: Object.assign({}, args[0], {
+        url: `${requestArgs.uri}?${qs}`,
+      }),
+    });
   })
   .then(() => request(...args))
   .catch((err) => {
