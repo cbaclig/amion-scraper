@@ -50,8 +50,8 @@ class Amion {
     return Crawler.init(password)
     .then(crawler => crawler.getCreateSchedulePage())
     .then((createSchedulePage) => {
-      const users = createSchedulePage.getUsers().slice(0, 1);
-      const months = createSchedulePage.getMonths().slice(0, 3);
+      const users = createSchedulePage.getUsers().slice(0, 20);
+      const months = createSchedulePage.getMonths();
 
       log('Schedules to fetch: ', users.reduce((list, user) => list.concat(months.map(month => ({ user, month }))), []));
 
