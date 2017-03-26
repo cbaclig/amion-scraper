@@ -36,13 +36,15 @@ module.exports = function dataStore() {
             schedules.push(...Messages.map(({ Body }) => JSON.parse(Body)));
 
             log(`Deleting ${Messages.length} messages`);
-            return sqs.deleteMessageBatch({
-              QueueUrl: QUEUE_URL,
-              Entries: Messages.map(({ ReceiptHandle }, i) => ({
-                Id: i.toString(),
-                ReceiptHandle,
-              })),
-            }).promise().then(getScheduleChunk);
+
+            return getScheduleChunk();
+            // return sqs.deleteMessageBatch({
+            //   QueueUrl: QUEUE_URL,
+            //   Entries: Messages.map(({ ReceiptHandle }, i) => ({
+            //     Id: i.toString(),
+            //     ReceiptHandle,
+            //   })),
+            // }).promise().then(getScheduleChunk);
           }
 
           // we're done!

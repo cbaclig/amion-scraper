@@ -11,7 +11,10 @@ function decryptPassword() {
   return new Promise((resolve, reject) => {
     // Decrypt code should run once and variables stored outside of the function
     // handler so that these are decrypted once per container
-    const kms = new AWS.KMS();
+    const kms = new AWS.KMS({
+      region: 'us-west-2',
+      apiVersion: '2014-11-01',
+    });
     kms.decrypt({ CiphertextBlob: new Buffer(encrypted, 'base64') }, (err, data) => {
       if (err) {
         log('Decrypt error:', err);
