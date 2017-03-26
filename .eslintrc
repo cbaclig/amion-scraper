@@ -1,8 +1,7 @@
 {
-  "extends": "eslint-config-airbnb",
+  "extends": "eslint-config-airbnb-base",
   "rules": {
     "no-underscore-dangle": 0,
-    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     "comma-dangle": ["error", {
        "arrays": "always-multiline",
        "objects": "always-multiline",
