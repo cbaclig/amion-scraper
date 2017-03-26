@@ -37,14 +37,13 @@ module.exports = function dataStore() {
 
             log(`Deleting ${Messages.length} messages`);
 
-            return getScheduleChunk();
-            // return sqs.deleteMessageBatch({
-            //   QueueUrl: QUEUE_URL,
-            //   Entries: Messages.map(({ ReceiptHandle }, i) => ({
-            //     Id: i.toString(),
-            //     ReceiptHandle,
-            //   })),
-            // }).promise().then(getScheduleChunk);
+            return sqs.deleteMessageBatch({
+              QueueUrl: QUEUE_URL,
+              Entries: Messages.map(({ ReceiptHandle }, i) => ({
+                Id: i.toString(),
+                ReceiptHandle,
+              })),
+            }).promise().then(getScheduleChunk);
           }
 
           // we're done!
