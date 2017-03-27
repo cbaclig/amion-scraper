@@ -28,27 +28,32 @@ module.exports = {
     ), Promise.resolve());
   },
 
-  dequeue(ctx) {
+  dequeue(ctx, fn) {
     return new Promise((resolve, reject) => {
       sqs.receiveMessage({
         QueueUrl: QUEUE_URL,
       }, (err, data) => (err ? reject(err) : resolve(data)));
     })
-    .then(data => new Promise((resolve, reject) => {
+    .then((data) => {
       const { Messages } = data;
 
-      log(`Received ${Messages && Messages.length ? '' : 'no '}data`, { ctx });
+      log(`Received message ${Messages && Messages.length ? '' : 'no '}data`, { ctx });
 
       if (Messages && Messages.length) {
         const [{ ReceiptHandle, Body }] = Messages;
 
-        sqs.deleteMessage({
-          QueueUrl: QUEUE_URL,
-          ReceiptHandle,
-        }, err => (err ? reject(err) : resolve(JSON.parse(Body))));
-      } else {
-        resolve();
+        return fn(JSON.parse(Body))
+        .then(() => new Promise((resolve, reject) => {
+          log(`Deleting message ${ReceiptHandle} from queue data`, { ctx });
+
+          sqs.deleteMessage({
+            QueueUrl: QUEUE_URL,
+            ReceiptHandle,
+          }, err => (err ? reject(err) : resolve()));
+        }));
       }
-    }));
+
+      return fn();
+    });
   },
 };

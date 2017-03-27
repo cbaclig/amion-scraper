@@ -57,7 +57,7 @@ class Crawler {
         Month: month,
       },
     })
-    .then($ => new MonthSchedulePage($));
+    .then($ => new MonthSchedulePage(this.ctx, $));
   }
 }
 

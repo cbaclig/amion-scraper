@@ -19,7 +19,9 @@ function decryptPassword(ctx) {
       if (error) {
         log('Decrypt error', {
           ctx,
-          error,
+          error: {
+            message: error.message,
+          },
         });
         reject(error);
       } else {
@@ -31,9 +33,7 @@ function decryptPassword(ctx) {
 
 function toCtx(context) {
   return {
-    ctx: {
-      lambdaRequestId: context.awsRequestId,
-    },
+    lambdaRequestId: context.awsRequestId,
   };
 }
 
@@ -47,7 +47,9 @@ exports.plan = (event, context, callback) => {
   .then(() => callback())
   .catch(error => log('Error in Lambda.plan()', {
     ctx,
-    error,
+    error: {
+      message: error.message,
+    },
   }));
 };
 
@@ -59,6 +61,8 @@ exports.processJob = (event, context, callback) => {
   .then(() => callback())
   .catch(error => log('Error in Lambda.processJob()', {
     ctx,
-    error,
+    error: {
+      message: error.message,
+    },
   }));
 };

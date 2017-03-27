@@ -15,8 +15,7 @@ module.exports = {
   },
 
   processJob(ctx, amionPassword) {
-    return JobQueue.dequeue(ctx)
-    .then((job) => {
+    return JobQueue.dequeue(ctx, (job) => {
       if (job) {
         return this.storeSchedule(ctx, amionPassword, job.user, job.month)
         .then(this.executeProcessJob.bind(this, ctx, amionPassword));
