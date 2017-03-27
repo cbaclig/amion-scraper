@@ -57,7 +57,7 @@ exports.processJob = (event, context, callback) => {
   decryptPassword()
   .then(password => Main.processJob(ctx, password))
   .then(() => callback())
-  .catch(error => log('Error in Lambda.plan()', {
+  .catch(error => log('Error in Lambda.processJob()', {
     ctx,
     error,
   }));

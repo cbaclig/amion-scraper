@@ -22,7 +22,7 @@ module.exports = {
         .then(this.executeProcessJob.bind(this, ctx, amionPassword));
       }
 
-      return this.processSchedules(ctx);
+      return this.loadSchedules(ctx);
     });
   },
 
@@ -36,7 +36,7 @@ module.exports = {
     .then(() => log(`Done storing schedule for ${user.id} on ${month}!`, { ctx }));
   },
 
-  processSchedules(ctx) {
+  loadSchedules(ctx) {
     // TODO don't replace the s3 file if there are no schedules?
     return scheduleStore.getAll(ctx, scheduleStore)
     .then(Translator.ingestICalSchedules.bind(null, ctx))
