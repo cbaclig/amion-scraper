@@ -17,8 +17,12 @@ class Amion {
     return Crawler.init(ctx, password)
     .then(crawler => crawler.getCreateSchedulePage())
     .then((createSchedulePage) => {
-      const users = createSchedulePage.getUsers().slice(0, 1);
+      let users = createSchedulePage.getUsers();
       const months = createSchedulePage.getMonths();
+
+      if (process.env.MAX_USERS) {
+        users = users.slice(0, process.env.MAX_USERS);
+      }
 
       log(`Found ${users.length * months.length} schedules to fetch`, {
         ctx,
