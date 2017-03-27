@@ -32,6 +32,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       sqs.receiveMessage({
         QueueUrl: QUEUE_URL,
+        VisibilityTimeout: 180, // Should be more than the avg amount of time to process
       }, (err, data) => (err ? reject(err) : resolve(data)));
     })
     .then((data) => {
