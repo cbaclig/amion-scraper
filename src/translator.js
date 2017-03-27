@@ -12,6 +12,11 @@ module.exports = {
       people[schedule.person.id] = schedule.person;
 
       return schedule.iCalStrings.reduce((icalDateMap, iCalString) => {
+        log('Parsing iCalString', {
+          ctx,
+          iCalString,
+        });
+
         const events = _.reduce(ical.parseICS(iCalString), (acc, event) => {
           if (!acc[event.summary]) Object.assign(acc, { [event.summary]: new RRuleSet() });
 
