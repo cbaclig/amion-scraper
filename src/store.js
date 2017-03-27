@@ -3,8 +3,8 @@ const AWS = require('aws-sdk');
 
 const sqs = new AWS.SQS({
   apiVersion: '2012-11-05',
-  endpoint: 'https://sqs.us-west-2.amazonaws.com',
-  region: 'us-west-2',
+  endpoint: `https://sqs.${process.env.AWS_S3_REGION}.amazonaws.com`,
+  region: process.env.AWS_S3_REGION,
 });
 
 const QUEUE_URL = 'https://sqs.us-west-2.amazonaws.com/877478752829/amion-scraper-job-results.fifo';

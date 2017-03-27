@@ -2,8 +2,8 @@ const log = require('./logger')('lambda');
 const AWS = require('aws-sdk');
 
 const lambda = new AWS.Lambda({
-  endpoint: 'https://lambda.us-west-2.amazonaws.com',
-  region: 'us-west-2',
+  endpoint: `https://lambda.${process.env.AWS_S3_REGION}.amazonaws.com`,
+  region: process.env.AWS_S3_REGION,
 });
 
 module.exports = {
