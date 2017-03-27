@@ -8,6 +8,7 @@ module.exports = function wrappedDebug(module) {
       new (Console)({
         json: true,
         stringify: true,
+        handleExceptions: true,
       }),
     ],
   });
