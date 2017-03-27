@@ -19,7 +19,7 @@ function decryptPassword(ctx) {
       if (error) {
         log('Decrypt error', {
           ctx,
-          error: {
+          err: {
             message: error.message,
             stack: error.stack,
           },
@@ -48,7 +48,7 @@ exports.plan = (event, context, callback) => {
   .then(() => callback())
   .catch(error => log('Error in Lambda.plan()', {
     ctx,
-    error: {
+    err: {
       message: error.message,
       stack: error.stack,
     },
@@ -63,7 +63,7 @@ exports.processJob = (event, context, callback) => {
   .then(() => callback())
   .catch(error => log('Error in Lambda.processJob()', {
     ctx,
-    error: {
+    err: {
       message: error.message,
       stack: error.stack,
     },
