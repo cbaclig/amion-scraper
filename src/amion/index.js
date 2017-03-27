@@ -2,8 +2,8 @@ const log = require('../logger')('amion');
 const Crawler = require('./crawler');
 
 class Amion {
-  static getICalScheduleForMonth(password, person, month) {
-    return Crawler.init(password)
+  static getICalScheduleForMonth(ctx, password, person, month) {
+    return Crawler.init(ctx, password)
     .then(crawler => crawler.createSchedule(person, month))
     .then(monthSchedulePage => monthSchedulePage.clickICalLink())
     .then(downloadICalPage => downloadICalPage.getICal())
@@ -13,14 +13,15 @@ class Amion {
     }));
   }
 
-  static getSchedulesToFetch(password) {
-    return Crawler.init(password)
+  static getSchedulesToFetch(ctx, password) {
+    return Crawler.init(ctx, password)
     .then(crawler => crawler.getCreateSchedulePage())
     .then((createSchedulePage) => {
-      const users = createSchedulePage.getUsers().slice(0, 20);
+      const users = createSchedulePage.getUsers().slice(0, 1);
       const months = createSchedulePage.getMonths();
 
-      log(`Found ${users.length * months.map} schedules to fetch`, {
+      log(`Found ${users.length * months.length} schedules to fetch`, {
+        ctx,
         months,
         users: users.map(u => u.name),
       });

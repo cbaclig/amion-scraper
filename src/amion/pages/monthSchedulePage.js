@@ -6,7 +6,8 @@ const BASE_URL = 'http://www.amion.com/cgi-bin/ocs';
 const DownloadMonthSchedulePage = require('./downloadMonthSchedulePage');
 
 class MonthSchedulePage {
-  constructor($) {
+  constructor(ctx, $) {
+    this.ctx = ctx;
     this.$ = $;
     this.sessionToken = $('input[name=File]').val();
   }
@@ -17,13 +18,13 @@ class MonthSchedulePage {
       return Object.assign(acc, { [key]: val });
     }, {});
 
-    return request({
+    return request(this.ctx, {
       method: 'GET',
       uri: BASE_URL,
       transform: body => cheerio.load(body),
       qs,
     })
-    .then($ => new DownloadMonthSchedulePage($));
+    .then($ => new DownloadMonthSchedulePage(this.ctx, $));
   }
 }
 

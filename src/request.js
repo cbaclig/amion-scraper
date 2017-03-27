@@ -4,7 +4,7 @@ const Throttle = require('generic-throttle');
 
 const throttle = new Throttle(1, 1000);
 
-module.exports = function loggedRequest(...args) {
+module.exports = function loggedRequest(ctx, ...args) {
   return throttle.acquire()
   .then(() => {
     const requestArgs = args[0];
@@ -13,14 +13,20 @@ module.exports = function loggedRequest(...args) {
       : '';
 
     log('HTTP Request: ', {
+      ctx,
       httpRequest: Object.assign({}, args[0], {
         url: `${requestArgs.uri}?${qs}`,
       }),
     });
   })
   .then(() => request(...args))
-  .catch((err) => {
-    log('Request Error:', err, ...args);
-    throw err;
+  .catch((error) => {
+    log('HTTP Request Error', {
+      ctx,
+      error,
+      args,
+    });
+
+    throw error;
   });
 };

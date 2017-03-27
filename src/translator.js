@@ -5,7 +5,7 @@ const _ = require('lodash');
 const { RRule, RRuleSet } = require('rrule-alt');
 
 module.exports = {
-  ingestICalSchedules(schedules) {
+  ingestICalSchedules(ctx, schedules) {
     const people = {};
 
     const dateMap = schedules.reduce((scheduleDateMap, schedule) => {
@@ -16,10 +16,16 @@ module.exports = {
           if (!acc[event.summary]) Object.assign(acc, { [event.summary]: new RRuleSet() });
 
           if (event.rrule) {
-            log('Adding recurring event: ', event);
+            log('Adding recurring event', {
+              ctx,
+              event,
+            });
             acc[event.summary].rrule(new RRule(event.rrule.origOptions));
           } else {
-            log('Adding single event: ', event);
+            log('Adding single event', {
+              ctx,
+              event,
+            });
             acc[event.summary].rdate(event.start);
           }
 

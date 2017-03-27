@@ -11,8 +11,8 @@ const QUEUE_URL = 'https://sqs.us-west-2.amazonaws.com/877478752829/amion-scrape
 const MESSAGE_GROUP_ID = 'jobs';
 
 module.exports = {
-  enqueue(jobs) {
-    log(`Enqueuing ${jobs.length} jobs`);
+  enqueue(ctx, jobs) {
+    log(`Enqueuing ${jobs.length} jobs`, { ctx });
 
     // TODO sendBatchMessage 1o at a time
     // TODO handle/log errors
@@ -28,7 +28,7 @@ module.exports = {
     ), Promise.resolve());
   },
 
-  dequeue() {
+  dequeue(ctx) {
     return new Promise((resolve, reject) => {
       sqs.receiveMessage({
         QueueUrl: QUEUE_URL,
@@ -37,7 +37,7 @@ module.exports = {
     .then(data => new Promise((resolve, reject) => {
       const { Messages } = data;
 
-      log(`Received ${Messages && Messages.length ? '' : 'no '}data`);
+      log(`Received ${Messages && Messages.length ? '' : 'no '}data`, { ctx });
 
       if (Messages && Messages.length) {
         const [{ ReceiptHandle, Body }] = Messages;

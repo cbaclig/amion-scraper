@@ -5,7 +5,7 @@ const AWS = require('aws-sdk');
 const encrypted = process.env.AMION_PASSWORD;
 let decrypted;
 
-function decryptPassword() {
+function decryptPassword(ctx) {
   if (decrypted) return Promise.resolve(decrypted);
 
   return new Promise((resolve, reject) => {
@@ -15,10 +15,13 @@ function decryptPassword() {
       region: 'us-west-2',
       apiVersion: '2014-11-01',
     });
-    kms.decrypt({ CiphertextBlob: new Buffer(encrypted, 'base64') }, (err, data) => {
-      if (err) {
-        log('Decrypt error:', err);
-        reject(err);
+    kms.decrypt({ CiphertextBlob: new Buffer(encrypted, 'base64') }, (error, data) => {
+      if (error) {
+        log('Decrypt error', {
+          ctx,
+          error,
+        });
+        reject(error);
       } else {
         resolve(data.Plaintext.toString('ascii'));
       }
@@ -26,24 +29,36 @@ function decryptPassword() {
   });
 }
 
+function toCtx(context) {
+  return {
+    ctx: {
+      lambdaRequestId: context.awsRequestId,
+    },
+  };
+}
+
 const Main = require('../src/');
 
 exports.plan = (event, context, callback) => {
-  decryptPassword()
-  .then(password => Main.start(password))
+  const ctx = toCtx(context);
+
+  decryptPassword(ctx)
+  .then(password => Main.start(ctx, password))
   .then(() => callback())
-  .catch(log);
+  .catch(error => log('Error in Lambda.plan()', {
+    ctx,
+    error,
+  }));
 };
 
 exports.processJob = (event, context, callback) => {
-  decryptPassword()
-  .then(password => Main.processJob(password))
-  .then(() => callback())
-  .catch(log);
-};
+  const ctx = toCtx(context);
 
-exports.reduce = (event, context, callback) => {
-  Main.processSchedules()
+  decryptPassword()
+  .then(password => Main.processJob(ctx, password))
   .then(() => callback())
-  .catch(log);
+  .catch(error => log('Error in Lambda.plan()', {
+    ctx,
+    error,
+  }));
 };

@@ -21,7 +21,8 @@ function optionElToUser($el) {
 }
 
 class CreateSchedulePage {
-  constructor($) {
+  constructor(ctx, $) {
+    this.ctx = ctx;
     this.$ = $;
     this.sessionToken = $('input[name=File]').val();
   }
@@ -52,7 +53,7 @@ class CreateSchedulePage {
 
   createSchedule(user, month) {
     // http://www.amion.com/cgi-bin/ocs?File=!54d8916alwuc]30&Page=Block&Rsel=302&Month=1-17
-    return request({
+    return request(this.ctx, {
       method: 'GET',
       uri: BASE_URL,
       transform: body => cheerio.load(body),
@@ -63,14 +64,14 @@ class CreateSchedulePage {
         Month: month,
       },
     })
-    .then($ => new MonthSchedulePage($));
+    .then($ => new MonthSchedulePage(this.ctx, $));
   }
 
   // Guesses the URL of the download page
   // Can't skip because iCAL file isn't actually generated until the download page is hit...
   skipToDownloadMonth(user, month) {
     // https://www.amion.com/cgi-bin/ocs?File=!24e1832bivvb^21&Page=Block&Rsel=252&Mo=2-17&VCAL=2
-    return request({
+    return request(this.ctx, {
       method: 'GET',
       uri: BASE_URL,
       transform: body => cheerio.load(body),
@@ -82,7 +83,7 @@ class CreateSchedulePage {
         VCAL: 2,
       },
     })
-    .then($ => new DownloadMonthSchedulePage($));
+    .then($ => new DownloadMonthSchedulePage(this.ctx, $));
   }
 }
 

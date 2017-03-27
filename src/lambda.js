@@ -7,8 +7,8 @@ const lambda = new AWS.Lambda({
 });
 
 module.exports = {
-  executeProcessJob() {
-    log('Invoking Lambda processJob function');
+  executeProcessJob(ctx) {
+    log('Invoking Lambda processJob function', { ctx });
 
     // TODO check for 202
     // > { StatusCode: 202, Payload: '' }

@@ -12,7 +12,7 @@ const MESSAGE_GROUP_ID = 'results';
 
 module.exports = function dataStore() {
   return {
-    add(user, month, schedule) {
+    add(ctx, user, month, schedule) {
       return sqs.sendMessage({
         QueueUrl: QUEUE_URL,
         MessageBody: JSON.stringify(schedule),
@@ -21,7 +21,7 @@ module.exports = function dataStore() {
       }).promise();
     },
 
-    getAll() {
+    getAll(ctx) {
       const schedules = [];
 
       function getScheduleChunk() {
@@ -31,11 +31,11 @@ module.exports = function dataStore() {
           // ReceiveRequestAttemptId: TODO look into using this to recover from network failures
         }).promise().then(({ Messages }) => {
           if (Messages && Messages.length) {
-            log(`Recevied ${Messages.length} messages`);
+            log(`Recevied ${Messages.length} messages`, { ctx });
 
             schedules.push(...Messages.map(({ Body }) => JSON.parse(Body)));
 
-            log(`Deleting ${Messages.length} messages`);
+            log(`Deleting ${Messages.length} messages`, { ctx });
 
             return sqs.deleteMessageBatch({
               QueueUrl: QUEUE_URL,

@@ -8,39 +8,39 @@ const JobQueue = require('./job_queue');
 const Lambda = require('./lambda');
 
 module.exports = {
-  start(amionPassword) {
-    return Amion.getSchedulesToFetch(amionPassword)
-    .then(JobQueue.enqueue)
-    .then(this.executeProcessJob.bind(this, amionPassword));
+  start(ctx, amionPassword) {
+    return Amion.getSchedulesToFetch(ctx, amionPassword)
+    .then(JobQueue.enqueue.bind(null, ctx))
+    .then(this.executeProcessJob.bind(this, ctx, amionPassword));
   },
 
-  processJob(amionPassword) {
-    return JobQueue.dequeue()
+  processJob(ctx, amionPassword) {
+    return JobQueue.dequeue(ctx)
     .then((job) => {
       if (job) {
-        return this.storeSchedule(amionPassword, job.user, job.month)
-        .then(this.executeProcessJob.bind(this, amionPassword));
+        return this.storeSchedule(ctx, amionPassword, job.user, job.month)
+        .then(this.executeProcessJob.bind(this, ctx, amionPassword));
       }
 
-      return this.processSchedules();
+      return this.processSchedules(ctx);
     });
   },
 
-  executeProcessJob() {
-    return Lambda.executeProcessJob();
+  executeProcessJob(ctx) {
+    return Lambda.executeProcessJob(ctx);
   },
 
-  storeSchedule(amionPassword, user, month) {
-    return Amion.getICalScheduleForMonth(amionPassword, user, month)
-    .then(schedule => scheduleStore.add(user, month, schedule))
-    .then(() => log(`Done storing schedule for ${user.id} on ${month}!`));
+  storeSchedule(ctx, amionPassword, user, month) {
+    return Amion.getICalScheduleForMonth(ctx, amionPassword, user, month)
+    .then(schedule => scheduleStore.add(ctx, user, month, schedule))
+    .then(() => log(`Done storing schedule for ${user.id} on ${month}!`, { ctx }));
   },
 
-  processSchedules() {
+  processSchedules(ctx) {
     // TODO don't replace the s3 file if there are no schedules?
-    return scheduleStore.getAll(scheduleStore)
-    .then(Translator.ingestICalSchedules)
-    .then(S3.uploadJSONData)
-    .then(() => log('Done!'));
+    return scheduleStore.getAll(ctx, scheduleStore)
+    .then(Translator.ingestICalSchedules.bind(null, ctx))
+    .then(S3.uploadJSONData.bind(null, ctx))
+    .then(() => log('Done loading schedules into S3', { ctx }));
   },
 };

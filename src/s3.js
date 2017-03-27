@@ -8,8 +8,8 @@ const s3 = new AWS.S3({
 });
 
 module.exports = {
-  uploadJSONData(jsonData) {
-    log('Uploading data to S3...');
+  uploadJSONData(ctx, jsonData) {
+    log('Uploading data to S3', { ctx });
 
     return s3.putObject({
       Bucket: process.env.AWS_S3_BUCKET,
