@@ -21,6 +21,7 @@ function decryptPassword(ctx) {
           ctx,
           error: {
             message: error.message,
+            stack: error.stack,
           },
         });
         reject(error);
@@ -49,6 +50,7 @@ exports.plan = (event, context, callback) => {
     ctx,
     error: {
       message: error.message,
+      stack: error.stack,
     },
   }));
 };
@@ -63,6 +65,7 @@ exports.processJob = (event, context, callback) => {
     ctx,
     error: {
       message: error.message,
+      stack: error.stack,
     },
   }));
 };

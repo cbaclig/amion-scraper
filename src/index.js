@@ -30,12 +30,14 @@ module.exports = {
   },
 
   storeSchedule(ctx, amionPassword, user, month) {
+    log(`Storing schedule for ${user.id} on ${month}`, { ctx });
     return Amion.getICalScheduleForMonth(ctx, amionPassword, user, month)
     .then(schedule => scheduleStore.add(ctx, user, month, schedule))
     .then(() => log(`Done storing schedule for ${user.id} on ${month}!`, { ctx }));
   },
 
   loadSchedules(ctx) {
+    log('Loading schedule for all users', { ctx });
     // TODO don't replace the s3 file if there are no schedules?
     return scheduleStore.getAll(ctx, scheduleStore)
     .then(Translator.ingestICalSchedules.bind(null, ctx))
